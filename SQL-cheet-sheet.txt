@@ -1,0 +1,3 @@
+SELECT * FROM <table_name>  -- get all rows
+
+DELETE FROM <table_name> -- delete all 

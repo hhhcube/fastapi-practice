@@ -1,0 +1,169 @@
+Join 
+- Querying two tables at the same time (joining tables)
+
+Composite Keys 
+- A primary key that spans many columns
+- Since Primary keys must be unique, this will ensure no user can like a post twice.
+
+
+-------------------- Query parameters -------------------
+pagenation is done with query parameters
+%20 - represents spaces in url 
+to access environment variable from command line you type < echo %<name of variable>% >
+
+
+my_postgres_db_url : 
+
+
+
+
+
+
+----------------------------------------------
+
+"psql" is the name of the command line interface.
+
+
+
+POSTGRESSQL
+Each instance of postgres can be carved into multiple separate databases
+working with pgAdmin 4 GUI 
+
+A table represents a subject or event in an application e.g. Users, Products, Purchases
+A table is made up of columns and rows 
+Each column represents a different attribute 
+Each row represents a different entry in the table
+Databases have datatypes the must be specified
+
+Data Type       Postgres                        Python 
+---------       -----------------------         ----------
+Numeric         int, decimal, precision         int, float
+Text            Varchar, text                   string     
+bool            boolean                         boolean
+sequence        array                           list 
+
+A primary key is a column or group of columns that uniquely identifies each row in a table 
+Table can have one and only one primary key - EAch entry must be unique 
+The primary key does not have to be the ID column always. It's up to you to decide which column uniquely defines each record.
+e.g. email, phone number 
+
+A UNIQUE constraint can be applied to any column to make sure every record has a unique value for that column.
+e.g. duplicates are not allowed (UNIQUE, NOT NULL)
+
+When an item is created in our database it is best practice to store a timestamp of the event.
+
+* means every single column 
+
+-------------------------------- Main objects in Psycopg 3 -------------------------------------------------
+
+# Note: the module name is psycopg, not psycopg3
+import psycopg
+
+# Connect to an existing database
+with psycopg.connect("dbname=test user=postgres") as conn:
+
+    # Open a cursor to perform database operations
+    with conn.cursor() as cur:
+
+        # Execute a command: this creates a new table
+        cur.execute("""
+            CREATE TABLE test (
+                id serial PRIMARY KEY,
+                num integer,
+                data text)
+            """)
+
+        # Pass data to fill a query placeholders and let Psycopg perform
+        # the correct conversion (no SQL injections!)
+        cur.execute(
+            "INSERT INTO test (num, data) VALUES (%s, %s)",
+            (100, "abc'def"))
+
+        # Query the database and obtain data as Python objects.
+        cur.execute("SELECT * FROM test")
+        cur.fetchone()
+        # will return (1, 100, "abc'def")
+
+        # You can use `cur.fetchmany()`, `cur.fetchall()` to return a list
+        # of several records, or even iterate on the cursor
+        for record in cur:
+            print(record)
+
+        # Make the changes to the database persistent
+        conn.commit()
+----------------------------------------------------------------------------------------------------------------------
+OBJECT RELATIONAL MAPPER(ORM)
+Layer of abstractions that sits between the database and our FastAPI abstractions
+We can use it to perform all database operations with traditional python code. No SQL
+
+Traditional way
+FastAPI <---- SQL -----> database
+
+ORM way (SQLALCHEMY is one of the most popular python ORMs)
+FastAPI <---- Python --> ORM <----- psycopg, SQL ----> database
+
+# We add or update tables in the database using pydantic models if necessary instead of manually defining tables with Raw SQL
+Class Post(Base):
+__tablename__ = "posts"
+
+id = Column(Integer, primary_key=True, index=True)
+title = Column(String, index=True, nullable=False)
+content = Column(String, nullable=False)
+published = Column(Boolean)
+
+# query a table and grab the first entry
+db.query(models.Post).filter(models.Post.id = id).first()
+
+Whatever database you want to install with SQLALCHEMY you need to install the associated driver.
+------------------------------------------------------------------------------------------------------------
+
+--------------------Create the SQLAlchemy parts----------------------------
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+
+SQLALCHEMY_DATABASE_URL = "sqlite:///./sql_app.db"
+# SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgresserver/db"
+
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+Base = declarative_base()
+
+------------------------------ Create a database URL for SQLAlchemy -----------------------------------
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+
+SQLALCHEMY_DATABASE_URL = "sqlite:///./sql_app.db"
+# SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgresserver/db"
+
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+Base = declarative_base()
+
+
+# create function to create database session instance
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+---------------------------------------------
+
+# Format of a connection string that we have to pass into SQLALCHEMY
+    SQLALCHEMY_DATABASE_URL = 'postgressql://<username>:<password>@<ip-address>:<hostname>/<database_name>'
+    SQLALCHEMY_DATABASE_URL = 'postgresql://postgres:chat247now@localhost/fastapi'
+
+
+# Create a engine which is responsible for SQL to connect to a postgres database
+    engine = create_engine(SQLALCHEMY_DATABASE_URL)
+
+
+-------Creating relationships between tables-----------
