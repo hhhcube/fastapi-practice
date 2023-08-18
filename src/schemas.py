@@ -37,9 +37,11 @@ class UserOut(BaseModel):
 
 
 
-class Post(PostBase):
+class Post(BaseModel):
     id: int
     created_at: datetime
+    title: str
+    content: str
     owner_id: int
     owner: UserOut        
 
@@ -51,6 +53,8 @@ class Post(PostBase):
 class PostOut(PostBase):
     Post: Post
     votes: int
+    title: str
+    content: str
          
 
     class Config:
