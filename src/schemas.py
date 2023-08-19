@@ -40,8 +40,8 @@ class UserOut(BaseModel):
 class Post(BaseModel):
     id: int
     created_at: datetime
-    title: str
-    content: str
+    # title: str
+    # content: str
     owner_id: int
     owner: UserOut        
 
@@ -50,11 +50,11 @@ class Post(BaseModel):
 
 
 
-class PostOut(PostBase):
+class PostOut(BaseModel):
     Post: Post
     votes: int
-    title: str
-    content: str
+    # title: str
+    # content: str
          
 
     class Config:
