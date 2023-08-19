@@ -68,8 +68,6 @@ def get_post(id: int,
              current_user: schemas.UserOut = Depends(oauth2.get_current_user)
 ):
     
-    # post = db.query(models.Post).filter(models.Post.id == id).first()
-
     post = db.query(models.Post, func.count(models.Votes.post_id).label("votes")).join(
         models.Votes, models.Votes.post_id == models.Post.id, isouter=True).group_by(models.Post.id).filter(models.Post.id == id).first()
     

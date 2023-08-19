@@ -1,0 +1,30 @@
+<!-- <h2>{{user.name | uppercase}} Details</h2>
+<div><span>id: </span>{{user.id}}</div>
+<div><span>name: </span>{{user.name}}</div> -->
+
+<!-- Two-way binding  -->
+<!-- <div>
+    <label for="name"> User name: </label>
+    <input id="name" [(ngModel)]="user.name" placeholder="name">
+</div> -->
+<!-- Binding with a list *ngFor -->
+<h2>My Users</h2>
+<ul class="users">
+  <li *ngFor="let user of users"> <!-- Add *ngFor to expose the property user to the list-->
+    <button [class.selected]="user === selectedUser" type="button" (click)="onSelect(user)">
+      <span class="badge">{{user.id}}</span>
+      <span class="name">{{user.name}}</span>
+    </button>
+  </li>
+</ul>
+
+
+<!-- Display details of selected user  -->
+<div *ngIf="selectedUser">
+    <h2>{{selectedUser.name | uppercase}} Details</h2>
+    <div>id: {{selectedUser.id}}</div>
+    <div>
+      <label for="user-name">User name: </label>
+      <input id="user-name" [(ngModel)]="selectedUser.name" placeholder="name">
+    </div>
+  </div>
