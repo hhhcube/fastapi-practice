@@ -8,7 +8,7 @@ from pydantic.types import conint
 # e.g. title str, content str, category str, published or draft bool
 # Python reads these models top down 
 
-# Create different models for each of the dsifferent request
+# Create different models for each of the different request
  
 
 # A Pydantic mode for creating a post
@@ -40,8 +40,6 @@ class UserOut(BaseModel):
 class Post(BaseModel):
     id: int
     created_at: datetime
-    # title: str
-    # content: str
     owner_id: int
     owner: UserOut        
 
@@ -53,9 +51,7 @@ class Post(BaseModel):
 class PostOut(BaseModel):
     Post: Post
     votes: int
-    # title: str
-    # content: str
-         
+      
 
     class Config:
         orm_mode = True
